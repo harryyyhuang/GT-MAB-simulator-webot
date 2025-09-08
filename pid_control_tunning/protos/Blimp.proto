@@ -73,10 +73,6 @@ PROTO Blimp [
       DEF GPS GPS {
         name "gps"
       }
-    DEF LightSensor LightSensor{
-        translation 0.05 0 -0.35      # Move 30cm forward
-        name "light_sensor"
-    }
     ]
     name IS name
     model "LIS Blimp"
