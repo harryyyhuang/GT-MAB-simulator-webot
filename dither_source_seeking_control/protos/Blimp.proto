@@ -1,0 +1,124 @@
+#VRML_SIM R2025a utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+# documentation url: https://webots.cloud/run?url=https://github.com/cyberbotics/webots/blob/released/projects/robots/epfl/lis/protos/Blimp.proto
+# keywords: robot/flying
+# The "Blimp" robot is a Zeppelin-like aerial robot developed by the EPFL LIS laboratory.
+
+PROTO Blimp [
+  field SFVec3f    translation     0 0 0.4     # Is `Pose.translation`.
+  field SFRotation rotation        0 0 1 0     # Is `Pose.rotation`.
+  field SFString   name            "Blimp"     # Is `Solid.name`.
+  field SFString   controller      "blimp"     # Is `Robot.controller`.
+  field MFString   controllerArgs  []          # Is `Robot.controllerArgs`.
+  field SFString   window          "<generic>" # Is `Robot.window`.
+  field SFString   customData      ""          # Is `Robot.customData`.
+  field SFBool     supervisor      TRUE       # Is `Robot.supervisor`.
+  field SFBool     synchronization TRUE        # Is `Robot.synchronization`.
+  field MFNode     extensionSlot   []          # Extends the robot with new nodes in the extension slot.
+]
+{
+  Robot {
+    translation IS translation
+    rotation IS rotation
+    children [
+      Group {
+        children IS extensionSlot
+      }
+      DEF emitter Emitter {
+        model "radio"
+        bufferSize 1000
+      }
+      Receiver {
+        bufferSize 1000
+      }
+      DEF DS0 DistanceSensor {
+        translation 0.54 0 0
+        name "ds0"
+        lookupTable [
+          0 255 0
+          0.25 0 0
+        ]
+      }
+      DEF DS6 DistanceSensor {
+        translation 0 0.26 0
+        rotation 0 0 1 1.57
+        name "ds6"
+        lookupTable [
+          0 255 0
+          0.25 0 0
+        ]
+      }
+      DEF FRAME Pose {
+        children [
+          # Main blimp mesh
+          Shape {
+            appearance PBRAppearance {
+              baseColor 0.7 0.7 1.0
+              roughness 0.5
+            }
+            geometry Mesh {
+              url "../asset/simple_MAB.stl"
+            }
+            castShadows FALSE
+          }
+        ]
+      }
+      DEF GYRO Gyro {
+        name "gyro"
+      }
+      DEF IMU InertialUnit {
+        name "imu"
+      }
+      DEF GPS GPS {
+        name "gps"
+      }
+    DEF LightSensor LightSensor{
+        translation 0.05 0 -0.35      # Move 30cm forward
+        name "light_sensor"
+    }
+    ]
+    name IS name
+    model "LIS Blimp"
+    
+    boundingObject Group {
+    children [
+      # Balloon collision sphere
+      DEF BalloonSphere Pose {
+        translation 0 0 0.4  # Adjust to match your balloon position
+        children [
+          Sphere {
+            radius 0.45  # Match your balloon radius
+          }
+        ]
+      }
+      # Gondola collision box
+      DEF GondolaBox Pose {
+        translation 0 0 -0.34  # Gondola position
+        children [
+          Box {
+            size 0.35 0.35 0.09  # Gondola dimensions
+          }
+        ]
+      }
+    ]
+  }
+    physics Physics {
+      # density -1
+      mass 0.38427096
+      centerOfMass [
+        0.03034612 -0.00625388 -0.06561044
+      ]
+      inertiaMatrix [
+        0.05039771 0.0500516 0.0207284
+        -6e-8 0.00003505 -8.5e-7
+      ]
+    }
+    controller IS controller
+    controllerArgs IS controllerArgs
+    window IS window
+    customData IS customData
+    supervisor IS supervisor
+    synchronization IS synchronization
+  }
+}
