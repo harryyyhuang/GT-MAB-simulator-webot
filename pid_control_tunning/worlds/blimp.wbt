@@ -1,0 +1,53 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "../protos/Blimp.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/lights/protos/FloorLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/lights/protos/CeilingLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/Floor.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Parquetry.proto"
+
+WorldInfo {
+  info [
+    "A blimp robot model demonstrating custom physics."
+    "If you wish you can control the robot with the keyboard:"
+    "The control keys are: up, down, right, left, page up, page down and space (reset)."
+    "Authors: Jean-Christophe Zufferey, Alexis Guanella, Antoine Beyeler"
+    "Laboratory of Intelligent Systems (LIS)"
+    "Swiss Federal Institute of Technology (EPFL), Lausanne"
+  ]
+  title "LIS-EPFL Blimp"
+  physics "blimp_physics"
+  contactProperties [
+    ContactProperties {
+      material1 "blimp"
+      coulombFriction [
+        0.6
+      ]
+      bounce 0.4
+      bounceVelocity 0
+    }
+  ]
+}
+Viewpoint {
+  orientation 0.12886696059458586 0.060173610492208145 -0.9898345533812433 1.921830125849391
+  position -0.7158540273007847 5.211143316155065 2.1781063902672084
+  bloomThreshold 100
+}
+TexturedBackground {
+}
+DEF blimp_lis Blimp {
+  translation -3.6117324178199413 -1.3011433366849614 0.409996597976880164
+
+}
+FloorLight {
+  translation 5.1988 5.329 0.0001
+  pointLightIntensity 5
+  pointLightCastShadows TRUE
+}
+Floor {
+  size 50 50
+  tileSize 0.8 0.8
+  appearance Parquetry {
+  }
+}
