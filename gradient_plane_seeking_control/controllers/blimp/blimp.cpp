@@ -24,6 +24,8 @@
 #include <cstdio>
 #include <vector>
 #include <fstream>
+#include <string>
+#include <algorithm>
 
 #define TIMESTEP 32  // ms
 #ifndef M_PI
@@ -244,6 +246,64 @@ double gradient_to_angle(double grad_x, double grad_y) {
     return atan2(grad_y, grad_x) * 180.0 / M_PI;
 }
 
+// === WRITE MAP DATA TO FILE ===
+void write_map_data(const std::string& filename) {
+    FILE *map_file = fopen(filename.c_str(), "w");
+    if (!map_file) {
+        printf("Failed to create map data file: %s\n", filename.c_str());
+        return;
+    }
+    
+    // Write CSV header
+    fprintf(map_file, "grid_x,grid_y,x,y,light_intensity,timestamp,yaw\n");
+    
+    // Write all map entries
+    for (const auto& entry : measurement_map) {
+        const GridCell& cell = entry.first;
+        const MeasurementPoint& point = entry.second;
+        
+        fprintf(map_file, "%d,%d,%.6f,%.6f,%.3f,%.3f,%.6f\n",
+                cell.grid_x, cell.grid_y,
+                point.x, point.y, point.light_intensity,
+                point.timestamp, point.yaw);
+    }
+    
+    fclose(map_file);
+    printf("Map data saved to '%s' with %zu locations\n", filename.c_str(), measurement_map.size());
+}
+
+// === WRITE GRADIENT FIELD DATA ===
+void write_gradient_field(const std::string& filename, double min_x, double max_x, double min_y, double max_y, double resolution = 0.5) {
+    FILE *grad_file = fopen(filename.c_str(), "w");
+    if (!grad_file) {
+        printf("Failed to create gradient field file: %s\n", filename.c_str());
+        return;
+    }
+    
+    // Write CSV header
+    fprintf(grad_file, "x,y,grad_x,grad_y,magnitude,valid\n");
+    
+    int valid_count = 0;
+    int total_count = 0;
+    
+    // Sample gradient field at regular intervals
+    for (double y = min_y; y <= max_y; y += resolution) {
+        for (double x = min_x; x <= max_x; x += resolution) {
+            double grad_x, grad_y, magnitude;
+            bool valid = estimate_gradient_from_map(x, y, grad_x, grad_y, magnitude);
+            
+            fprintf(grad_file, "%.3f,%.3f,%.6f,%.6f,%.6f,%d\n",
+                    x, y, grad_x, grad_y, magnitude, valid ? 1 : 0);
+            
+            if (valid) valid_count++;
+            total_count++;
+        }
+    }
+    
+    fclose(grad_file);
+    printf("Gradient field saved to '%s' (%d/%d valid points)\n", filename.c_str(), valid_count, total_count);
+}
+
 // Main loop
 int main() {
     printf("=== HISTORY-BASED GRADIENT FOLLOWING WITH EXPLORE/SEEK STATES ===\n");
@@ -462,6 +522,34 @@ int main() {
 
     // --- Cleanup ---
     if (trajectory_log) fclose(trajectory_log);
+    
+    // Write out map data and gradient field for visualization
+    if (measurement_map.size() > 0) {
+        write_map_data("logs/measurement_map.csv");
+        write_map_data("measurement_map.csv"); // Fallback to current directory
+        
+        // Calculate bounds for gradient field based on trajectory
+        double min_x = est_x - 5.0, max_x = est_x + 5.0;
+        double min_y = est_y - 5.0, max_y = est_y + 5.0;
+        
+        // Adjust bounds to include target and map points
+        min_x = std::min(min_x, TARGET_X - 2.0);
+        max_x = std::max(max_x, TARGET_X + 2.0);
+        min_y = std::min(min_y, TARGET_Y - 2.0);
+        max_y = std::max(max_y, TARGET_Y + 2.0);
+        
+        for (const auto& entry : measurement_map) {
+            const MeasurementPoint& point = entry.second;
+            min_x = std::min(min_x, point.x - 1.0);
+            max_x = std::max(max_x, point.x + 1.0);
+            min_y = std::min(min_y, point.y - 1.0);
+            max_y = std::max(max_y, point.y + 1.0);
+        }
+        
+        write_gradient_field("logs/gradient_field.csv", min_x, max_x, min_y, max_y);
+        write_gradient_field("gradient_field.csv", min_x, max_x, min_y, max_y); // Fallback
+    }
+    
     printf("Map-based gradient following completed. Final map size: %zu locations\n", measurement_map.size());
     printf("Trajectory log saved to 'history_gradient_trajectory.csv'\n");
 

@@ -1,0 +1,34 @@
+
+=== GRADIENT MAP SEEKING PERFORMANCE REPORT ===
+
+Mission Summary:
+- Total mission time: 47.5 seconds
+- Final distance to target: 0.503 m
+- Minimum distance achieved: 0.503 m
+- Mission success: [FAILED] NO (threshold: 0.5m)
+
+Path Analysis:
+- Total path length: 12.48 m
+- Direct distance to target: 11.03 m
+- Path efficiency: 88.4%
+
+Control Mode Distribution:
+- SEEKING: 1175 steps (79.3%)
+- EXPLORING: 250 steps (16.9%)
+- FORWARD: 57 steps (3.8%)
+
+Map Building Statistics:
+- Total measurements: 80
+- Light intensity range: 0.00 - 517.14
+- Spatial coverage: 80 grid cells
+- Average light intensity: 166.88
+
+Gradient Field Statistics:
+- Valid gradient points: 287/750 (38.3%)
+- Average gradient magnitude: 202.818
+- Max gradient magnitude: 1575.682
+
+Performance Insights:
+- Average speed: 0.289 m/s
+- Speed tracking error (RMS): 0.077 m/s
+- Light intensity improvement: 226.40
