@@ -23,7 +23,7 @@ logs/*.dat
 !logs/README.md
 
 # Ignore analysis output plots but keep analysis scripts
-analysis/plots/
+analysis/plots/*
 analysis/__pycache__/
 analysis/*.pyc
 
